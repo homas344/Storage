@@ -1,9 +1,8 @@
 package me.homas343.storage;
 
-import me.homas343.storage.bd.ConnectManager;
+import me.homas343.storage.mysql.ConnectManager;
 import me.homas343.storage.command.StorageCommand;
 import me.homas343.storage.command.StorageTabCompleter;
-import me.homas343.storage.guis.PaginationManager;
 import me.homas343.storage.listeners.InventoryClickListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -44,7 +43,6 @@ public class Core extends JavaPlugin {
     public static Core getInstance() {
         return instance;
     }
-
     public ConnectManager getConnectManager() {
         return connectManager;
     }

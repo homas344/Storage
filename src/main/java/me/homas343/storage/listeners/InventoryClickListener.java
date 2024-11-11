@@ -1,9 +1,9 @@
 package me.homas343.storage.listeners;
 
 import me.homas343.storage.Core;
-import me.homas343.storage.bd.RemoveManager;
-import me.homas343.storage.guis.*;
-import org.bukkit.Bukkit;
+import me.homas343.storage.PaginationManager;
+import me.homas343.storage.mysql.RemoveManager;
+import me.homas343.storage.gui.*;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,8 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 
 public class InventoryClickListener implements Listener {
 
@@ -37,9 +36,9 @@ public class InventoryClickListener implements Listener {
 
         if (title.startsWith("Хранилище игрока")) {
             String targetPlayer = title.split(" ")[2];
-            handleNavigationButtons(displayName, event, new StoragePlayerInventory(), targetPlayer);
+            handleNavigationButtons(displayName, event, new PaginatedPlayerInventory(), targetPlayer);
 
-        } else handleNavigationButtons(displayName, event, new StorageGlobalInventory(), null);
+        } else handleNavigationButtons(displayName, event, new PaginatedGlobalInventory(), null);
     }
 
     private void handleMyItemsInventoryClick(InventoryClickEvent event) {
@@ -55,7 +54,7 @@ public class InventoryClickListener implements Listener {
         if (clickedItem == null || !clickedItem.hasItemMeta()) return;
 
         String displayName = clickedItem.getItemMeta().getDisplayName();
-        handleNavigationButtons(displayName, event, new StorageItemsInventory(), null);
+        handleNavigationButtons(displayName, event, new PaginatedItemsInventory(), null);
     }
 
     private void removeItemFromStorage(Player player, ItemStack item) {
@@ -65,7 +64,7 @@ public class InventoryClickListener implements Listener {
     }
 
     private void updateMyItemsInventory(Player player) {
-        List<Map<String, String>> playerItems = Core.getInstance().getConnectManager().getItemsByPlayerName(player.getDisplayName());
+        HashMap<String, String> playerItems = Core.getInstance().getConnectManager().getItemsByPlayerName(player.getDisplayName());
 
         if (playerItems.isEmpty()) {
             player.closeInventory();
@@ -78,12 +77,12 @@ public class InventoryClickListener implements Listener {
             currentPage--;
         }
 
-        StorageItemsInventory storageItemsInventory = new StorageItemsInventory();
+        PaginatedItemsInventory storageItemsInventory = new PaginatedItemsInventory();
         storageItemsInventory.openPaginatedInventory(player, currentPage, playerItems);
     }
 
 
-    private void handleNavigationButtons(String displayName, InventoryClickEvent event, PaginatedMenu paginatedMenu,
+    private void handleNavigationButtons(String displayName, InventoryClickEvent event, AbstractPaginatedMenu paginatedMenu,
                                          String targetPlayer) {
 
         if (displayName.equals("§eСледующая страница")) {
@@ -97,25 +96,25 @@ public class InventoryClickListener implements Listener {
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK,1,2);
     }
 
-    private void handleNextPage(InventoryClickEvent event, PaginatedMenu paginatedMenu, String targetPlayer) {
+    private void handleNextPage(InventoryClickEvent event, AbstractPaginatedMenu paginatedMenu, String targetPlayer) {
         Player player = (Player) event.getWhoClicked();
         int currentPage = paginationManager.getCurrentPage(player);
-        if (paginatedMenu instanceof StoragePlayerInventory && targetPlayer != null) {
-            ((StoragePlayerInventory) paginatedMenu).openPlayerInventory(player, targetPlayer, currentPage + 1);
-        } else if (paginatedMenu instanceof StorageItemsInventory) {
+        if (paginatedMenu instanceof PaginatedPlayerInventory && targetPlayer != null) {
+            ((PaginatedPlayerInventory) paginatedMenu).openPlayerInventory(player, targetPlayer, currentPage + 1);
+        } else if (paginatedMenu instanceof PaginatedItemsInventory) {
             paginatedMenu.openPaginatedInventory(player, currentPage + 1, Core.getInstance().getConnectManager().getItemsByPlayerName(player.getDisplayName()));
         } else {
             paginatedMenu.openPaginatedInventory(player, currentPage + 1, Core.getInstance().getConnectManager().getCurrentTable());
         }
     }
 
-    private void handlePreviousPage(InventoryClickEvent event, PaginatedMenu paginatedMenu, String targetPlayer) {
+    private void handlePreviousPage(InventoryClickEvent event, AbstractPaginatedMenu paginatedMenu, String targetPlayer) {
         Player player = (Player) event.getWhoClicked();
         int currentPage = paginationManager.getCurrentPage(player);
         if (currentPage > 1) {
-            if (paginatedMenu instanceof StoragePlayerInventory && targetPlayer != null) {
-                ((StoragePlayerInventory) paginatedMenu).openPlayerInventory(player, targetPlayer, currentPage - 1);
-            } else if (paginatedMenu instanceof StorageItemsInventory) {
+            if (paginatedMenu instanceof PaginatedPlayerInventory && targetPlayer != null) {
+                ((PaginatedPlayerInventory) paginatedMenu).openPlayerInventory(player, targetPlayer, currentPage - 1);
+            } else if (paginatedMenu instanceof PaginatedItemsInventory) {
                 paginatedMenu.openPaginatedInventory(player, currentPage - 1, Core.getInstance().getConnectManager().getItemsByPlayerName(player.getDisplayName()));
             } else {
                 paginatedMenu.openPaginatedInventory(player, currentPage - 1, Core.getInstance().getConnectManager().getCurrentTable());

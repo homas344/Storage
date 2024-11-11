@@ -1,6 +1,6 @@
 package me.homas343.storage;
 
-import me.homas343.storage.bd.SaveManager;
+import me.homas343.storage.mysql.SaveManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
