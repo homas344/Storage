@@ -1,0 +1,10 @@
+db: # Данные для подключения к бд
+  host: '127.0.0.1'
+  db_name: 'coredb'
+  port: 3306
+  user: root
+  password: ''
+
+oth: # Настройка описания
+  lore:
+    - '&7Владелец: &a%player_name%'

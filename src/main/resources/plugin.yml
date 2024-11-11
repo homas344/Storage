@@ -1,0 +1,8 @@
+name: Storage
+version: '1.0'
+main: me.homas343.storage.Core
+api-version: '1.20'
+commands:
+  storage:
+    description: 'Основная команда плагина'
+
